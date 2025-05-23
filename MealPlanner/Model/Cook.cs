@@ -30,7 +30,18 @@ namespace MealPlanner.Model
         /// <param name="recipeFiles">Array of file paths</param>
         public void LoadRecipeFiles(string[] recipeFiles)
         {
-            //Implement Me
+            foreach (string file in recipeFiles)
+            {
+                try
+                {
+                    IRecipe recipe = Recipe.Parse(file);
+                    recipeBook.Add(recipe);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Error loading recipe from file " + file + ": " + e.Message);
+                }
+            }
         }
 
         /// <summary>
