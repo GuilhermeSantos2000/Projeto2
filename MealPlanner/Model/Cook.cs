@@ -47,8 +47,21 @@ namespace MealPlanner.Model
                 for (int i = 1; i < lines.Length; i++)
                 {
                     string[] parts = lines[i].Split(' ');
-                    IIngredient ingredient = new Ingredient(parts[0].Trim(), parts[1].Trim());
+                    string ingredientName = parts[0].Trim();
                     int quantity = int.Parse(parts[1].Trim());
+
+                    IIngredient ingredient = null;
+                    foreach (IIngredient yummy in pantry.Ingredients)
+                    {
+                        if (yummy.Name.Equals(ingredientName, StringComparison.OrdinalIgnoreCase))
+                        {
+                            ingredient = yummy;
+                            break;
+                        }
+                    }
+                    if (ingredient == null)
+                        ingredient = new Ingredient(ingredientName, "");
+
                     ingredientsNeeded.Add(ingredient, quantity);
                 }
 
