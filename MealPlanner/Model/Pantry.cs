@@ -40,7 +40,13 @@ namespace MealPlanner.Model
         /// <param name="quantity">The new amount to set</param>
         public void AddIngredient(IIngredient ingredient, int quantity)
         {
-            //Implement Me
+            if (quantity <= 0)
+                return;
+
+            if (ingredients.ContainsKey(ingredient))
+                ingredients[ingredient] += quantity;
+            else
+                ingredients.Add(ingredient, quantity);
         }
 
         /// <summary>
@@ -53,7 +59,18 @@ namespace MealPlanner.Model
         /// pantry or if there's not enough quantity</returns>
         public bool ConsumeIngredient(IIngredient ingredient, int quantity)
         {
-            //Implement Me
+            if (quantity <= 0)
+                return false;
+            if (ingredients.ContainsKey(ingredient))
+            {
+                if (ingredients[ingredient] >= quantity)
+                {
+                    ingredients[ingredient] -= quantity;
+                    if (ingredients[ingredient] == 0)
+                        ingredients.Remove(ingredient);
+                    return true;
+                }
+            }
             return false;
         }
 
@@ -86,7 +103,18 @@ namespace MealPlanner.Model
         /// <param name="file">Path to the ingredients file</param>
         public void LoadIngredientsFile(string file)
         {
-            //Implement Me
+            string[] lines = System.IO.File.ReadAllLines(file);
+            foreach (string line in lines)
+            {
+                string[] parts = line.Split(',');
+                if (parts.Length == 2)
+                {
+                    string name = parts[0].Trim();
+                    int quantity = int.Parse(parts[1].Trim());
+                    IIngredient ingredient = new Ingredient(name, "Unknown");
+                    AddIngredient(ingredient, quantity);
+                }
+            }
         }
     }
 }
