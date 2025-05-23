@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace MealPlanner.Model
 {
@@ -32,15 +33,27 @@ namespace MealPlanner.Model
         {
             foreach (string file in recipeFiles)
             {
-                try
+                string[] lines = System.IO.File.ReadAllLines(file);
+                if (lines.Length < 2)
+                    throw new ArgumentException("Invalid recipe file format.");
+
+                string[] header = lines[0].Split(' ');
+                string name = header[0].Trim();
+                double successRate = double.Parse(header[1].Trim(), CultureInfo.InvariantCulture);
+
+                Dictionary<IIngredient, int> ingredientsNeeded =
+                    new Dictionary<IIngredient, int>();
+
+                for (int i = 1; i < lines.Length; i++)
                 {
-                    IRecipe recipe = Recipe.Parse(file);
-                    recipeBook.Add(recipe);
+                    string[] parts = lines[i].Split(' ');
+                    IIngredient ingredient = new Ingredient(parts[0].Trim(), parts[1].Trim());
+                    int quantity = int.Parse(parts[1].Trim());
+                    ingredientsNeeded.Add(ingredient, quantity);
                 }
-                catch (Exception e)
-                {
-                    Console.WriteLine("Error loading recipe from file " + file + ": " + e.Message);
-                }
+
+                IRecipe recipe = new Recipe(name, ingredientsNeeded, successRate);
+                recipeBook.Add(recipe);
             }
         }
 
